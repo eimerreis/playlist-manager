@@ -1,4 +1,3 @@
-import SpotifyWebApi from "spotify-web-api-node";
 
 interface Response<T> {
     body: T;
@@ -10,7 +9,7 @@ export const FetchAllItems = async <T>(callFunction: (limit: number, offset: num
     let records: T[] = [];
     let keepGoing = true;
     let offset = 0;
-    let limit = overrides?.limit || 100;
+    let limit = overrides && overrides.limit ? overrides.limit : 100;
     while (keepGoing) {
         const response = await callFunction(limit, offset);
         records = [...records, ...response.body.items];

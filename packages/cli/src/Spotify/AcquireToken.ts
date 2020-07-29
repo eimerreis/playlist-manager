@@ -2,12 +2,12 @@ import express from "express";
 import superagent from "superagent";
 import kleur from "kleur";
 import SpotifyApi from "spotify-web-api-node";
-import signale from "signale";
+import logger from "loglevel";
 import { SpotifyClientId, SpotifyClientSecret } from "@env";
 import opn from "opn";
 
 import { ConfigurePlaylistManagement } from "../ConfigurePlaylistManagement";
-import { AccessTokenResponse } from "./AccessTokenResponse";
+import { AccessTokenResponse } from "@eimerreis/playlist-manager-shared/src/Spotify/AccessTokenResponse";
 
 //todo: move constants to config
 const scopes = "playlist-modify-public playlist-modify-private playlist-read-private"
@@ -32,7 +32,7 @@ const SuccessMessage = `
         </head>
         <body>
             <h1>Login Successful</h1>
-            <p> This window will close itself automatically in after seconds </p>
+            <p> This window will close itself automatically after 5 seconds </p>
         </body>
     </html>
 
@@ -75,6 +75,6 @@ const server = app.listen(3000, () => {
 });
 
 export const AcquireToken = () => {
-    signale.log(kleur.bold("Logging you in to your"), kleur.green("Spotify Account"));
+    logger.info(kleur.bold("Logging you in to your"), kleur.green("Spotify Account"));
     opn(`https://accounts.spotify.com/authorize?response_type=code&client_id=${SpotifyClientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(RedirectUri)}`);
 }

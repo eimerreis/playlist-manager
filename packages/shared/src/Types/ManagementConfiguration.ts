@@ -1,5 +1,6 @@
 import { Direction } from "./Direction";
-export interface ManagementOption {
+
+export interface ManagementConfiguration {
     playlist: SpotifyApi.PlaylistObjectSimplified;
     maxTracks: number;
     archive: boolean;

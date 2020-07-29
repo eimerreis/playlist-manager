@@ -5,21 +5,13 @@
   "license": "MIT",
   "scripts": {
     "watch": "./node_modules/.bin/babel src -d lib --extensions '.ts' --watch",
-    "build": "./node_modules/.bin/babel src -d lib --extensions '.ts'",
+    "build-dependencies": "yarn workspace @eimerreis/playlist-manager-shared build",
+    "build": "yarn build-dependencies && ./node_modules/.bin/babel src -d lib --extensions '.ts'",
     "start": "yarn build && node lib/index.js"
   },
   "dependencies": {
-    "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.10.5",
-    "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@babel/preset-env": "^7.10.4",
-    "@babel/preset-typescript": "^7.10.4",
-    "@types/express": "^4.17.7",
-    "@types/opn": "^5.5.0",
+    "@eimerreis/playlist-manager-shared": "^1.0.0",
     "@types/prompts": "^2.0.8",
-    "@types/signale": "^1.4.1",
-    "@types/spotify-web-api-node": "^4.0.1",
-    "babel-plugin-dotenv-import": "^2.1.0",
     "express": "^4.17.1",
     "kleur": "^4.0.2",
     "opn": "^6.0.0",
@@ -29,8 +21,14 @@
     "superagent": "^5.3.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
     "@types/jest": "^26.0.7",
     "@types/superagent": "^4.1.8",
+    "babel-plugin-dotenv-import": "^2.1.0",
     "jest": "^26.1.0"
   }
 }

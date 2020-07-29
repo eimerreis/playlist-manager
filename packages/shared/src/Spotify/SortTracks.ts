@@ -1,4 +1,4 @@
-import { Direction } from "./Types/Direction";
+import { Direction } from "../Types/Direction";
 
 export const SortTracks = (tracks: SpotifyApi.PlaylistTrackObject[], direction: Direction) => [...tracks].sort((a, b) => {
     const aDate = new Date(a.added_at);

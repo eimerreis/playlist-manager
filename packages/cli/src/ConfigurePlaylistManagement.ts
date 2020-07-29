@@ -1,22 +1,30 @@
 import kleur from "kleur";
+import logger from "loglevel";
 import prompts from "prompts";
-import signale from "signale";
-
+import superagent from "superagent";
 import SpotifyWebApi from "spotify-web-api-node";
-import { FetchAllItems } from "./Spotify/FetchAllItems";
-import { ManagementOption } from "./Types/ManagementOption";
-import { Direction } from "./Types/Direction";
-import { SortTracks } from "./SortTracks";
-import { SortPlaylists } from "./Spotify/SortPlaylists";
+
+
+import { FetchAllItems, SortPlaylists, ManagementRequest, CreateArchivePlaylist, AddTracksToArchiveList } from "@eimerreis/playlist-manager-shared"
+import { ManagementConfiguration } from "@eimerreis/playlist-manager-shared";
+import { Direction } from "@eimerreis/playlist-manager-shared";
+
+enum ArchiveChoice {
+    Create,
+    Select
+}
 
 
 export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
     try {
+        const accountResponse = await api.getMe();
+        const accountId = accountResponse.body.id;
+
         const playlists = await FetchAllItems((limit, offset) => api.getUserPlaylists({ limit, offset }), { limit: 50 });
 
         // ask which playlists to manage
         const playlistsToManage: { playlists: SpotifyApi.PlaylistObjectSimplified[] } = await prompts({
-            type: "multiselect",
+            type: "autocompleteMultiselect",
             validate: (x) => Array.isArray(x) && x.length > 0 ? true : "You should at least select 1 playlist",
             name: "playlists",
             message: "Which playlists do you want to manage?",
@@ -26,14 +34,14 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
             }))
         }, { onCancel: () => process.exit(0) });
 
-        const managementOptions: ManagementOption[] = [];
+        const managementConfigurations: ManagementConfiguration[] = [];
 
         // for each playlist, ask for managing options
         for (const playlist of playlistsToManage.playlists) {
             console.log("");
             console.log(kleur.bold().blue(`Management Settings for Playlist ${playlist.name}`));
-            
-            const { numberOfTracks, archive, direction } = await prompts([
+
+            const { numberOfTracks, archiveListId, direction, createOrSelect } = await prompts([
                 {
                     name: "numberOfTracks",
                     type: "number",
@@ -62,23 +70,77 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
                     active: "yes",
                     inactive: "no",
                     initial: true
+                },
+                {
+                    name: "createOrSelect",
+                    type: prev => prev === true ? "select" : null,
+                    message: "Do you want to use an existing List as the archive, or create a new one?",
+                    choices: [
+                        {
+                            "title": "Create an archive list",
+                            "value": ArchiveChoice.Create,
+                        },
+                        {
+                            "title": "Select an existing list",
+                            "value": ArchiveChoice.Select
+                        }
+                    ]
+                },
+                {
+                    name: "archiveListId",
+                    message: prev => prev === ArchiveChoice.Create ? "Provide a name for the archive list" : "Select an archive list",
+                    type: prev => prev === ArchiveChoice.Create ? "text" : "select",
+                    choices: playlists.filter(x => x.id !== playlist.id).map(x => {
+                        return {
+                            title: x.name,
+                            value: x.id
+                        }
+                    }),
                 }
             ], { onCancel: () => process.exit(0) });
 
-            managementOptions.push({
+
+            let archiveList = archiveListId;
+
+            // create archive list if necessary
+            if (createOrSelect === ArchiveChoice.Create) {
+                await CreateArchivePlaylist({ accountId, listName: archiveListId, playlist }, api);
+            } else {
+                await AddTracksToArchiveList(playlist.id, archiveListId, api);
+            }
+
+            managementConfigurations.push({
                 playlist,
                 maxTracks: numberOfTracks,
-                archive,
+                archive: archiveList,
                 direction
             });
         }
 
-        SortPlaylists(managementOptions, api);
+        if(managementConfigurations.length === 0) {
+            logger.info("You did not select any playlist to manage. Exiting the progam.");
+            process.exit(0);
+        }
 
-        // todo: merge existing configuration!?
+        logger.info(`Initially sorting playlists according to configuration.`);
+        await SortPlaylists(managementConfigurations, api);
 
-        // todo: start playlist manager command, which does the api call
-        // persistence for access tokens?
+        const managementRequest: ManagementRequest = {
+            configurations: managementConfigurations,
+            refreshToken: api.getRefreshToken()!,
+            accountId: accountResponse.body.id,
+        }
+
+        logger.info(`Sending ${kleur.bold(managementConfigurations.length)} playlist configurations to management service...`);
+        const response = await superagent
+            .post("https://localhost:3000/api/manage")
+            .send(managementRequest);
+
+        if (response.status === 201) {
+            logger.info(`Management for your playlists has been scheduled successfully`);
+        } else {
+            logger.error("Something went wrong, when sending your playlist management request");
+        }
     } catch (err) {
         console.error(err);
     }

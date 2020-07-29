@@ -1,0 +1,24 @@
+{
+  "name": "@eimerreis/playlist-manager-shared",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "cd ./src && npx barrelsby --delete --exclude lib --location all && cd ../ && ./node_modules/.bin/babel src -d lib --extensions '.ts' && tsc",
+    "develop": "tsc --watch"
+  },
+  "dependencies": {
+    "loglevel": "^1.6.8",
+    "spotify-web-api-node": "^4.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/spotify-web-api-node": "^4.0.1",
+    "babel-plugin-dotenv-import": "^2.1.0"
+  },
+  "license": "MIT"
+}

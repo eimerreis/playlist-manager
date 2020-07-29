@@ -41,7 +41,7 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
             console.log("");
             console.log(kleur.bold().blue(`Management Settings for Playlist ${playlist.name}`));
 
-            const { numberOfTracks, archiveListId, direction, createOrSelect } = await prompts([
+            const { numberOfTracks, archive, direction } = await prompts([
                 {
                     name: "numberOfTracks",
                     type: "number",
@@ -71,43 +71,51 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
                     inactive: "no",
                     initial: true
                 },
-                {
-                    name: "createOrSelect",
-                    type: prev => prev === true ? "select" : null,
-                    message: "Do you want to use an existing List as the archive, or create a new one?",
-                    choices: [
-                        {
-                            "title": "Create an archive list",
-                            "value": ArchiveChoice.Create,
-                        },
-                        {
-                            "title": "Select an existing list",
-                            "value": ArchiveChoice.Select
-                        }
-                    ]
-                },
-                {
-                    name: "archiveListId",
-                    message: prev => prev === ArchiveChoice.Create ? "Provide a name for the archive list" : "Select an archive list",
-                    type: prev => prev === ArchiveChoice.Create ? "text" : "select",
-                    choices: playlists.filter(x => x.id !== playlist.id).map(x => {
-                        return {
-                            title: x.name,
-                            value: x.id
-                        }
-                    }),
-                }
             ], { onCancel: () => process.exit(0) });
 
+            let archiveList: string = "";
+            if (archive) {
+                const { archiveListId, createOrSelect } = await prompts([
+                    {
+                        name: "createOrSelect",
+                        type: archive ? "select" : null,
+                        message: "Do you want to use an existing List as the archive, or create a new one?",
+                        choices: [
+                            {
+                                "title": "Create an archive list",
+                                "value": ArchiveChoice.Create,
+                            },
+                            {
+                                "title": "Select an existing list",
+                                "value": ArchiveChoice.Select
+                            }
+                        ]
+                    },
+                    {
+                        name: "archiveListId",
+                        message: prev => prev === ArchiveChoice.Create ? "Provide a name for the archive list" : "Select an archive list",
+                        type: prev => prev === ArchiveChoice.Create ? "text" : "select",
+                        choices: playlists.filter(x => x.id !== playlist.id).map(x => {
+                            return {
+                                title: x.name,
+                                value: x.id
+                            }
+                        }),
+                    }
+                ], { onCancel: () => process.exit(0) });
 
-            let archiveList = archiveListId;
-
-            // create archive list if necessary
-            if (createOrSelect === ArchiveChoice.Create) {
-                await CreateArchivePlaylist({ accountId, listName: archiveListId, playlist }, api);
-            } else {
-                await AddTracksToArchiveList(playlist.id, archiveListId, api);
+                // create archive list if necessary
+                if (createOrSelect === ArchiveChoice.Create) {
+                    const id = await CreateArchivePlaylist({ accountId, listName: archiveListId, playlist }, api);
+                    if(id) {
+                        archiveList = id;
+                    }
+                } else {
+                    archiveList = archiveListId;
+                    await AddTracksToArchiveList(playlist.id, archiveListId, api);
+                }
             }
+
 
             managementConfigurations.push({
                 playlist,
@@ -117,7 +125,7 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
             });
         }
 
-        if(managementConfigurations.length === 0) {
+        if (managementConfigurations.length === 0) {
             logger.info("You did not select any playlist to manage. Exiting the progam.");
             process.exit(0);
         }
@@ -133,7 +141,7 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
 
         logger.info(`Sending ${kleur.bold(managementConfigurations.length)} playlist configurations to management service...`);
         const response = await superagent
-            .post("https://localhost:3000/api/manage")
+            .post("http://localhost:3001/api/manage")
             .send(managementRequest);
 
         if (response.status === 201) {

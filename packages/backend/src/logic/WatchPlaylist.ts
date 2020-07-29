@@ -1,32 +1,54 @@
 import SpotifyApi from "spotify-web-api-node";
-import { SpotifyClientId, SpotifyClientSecret } from "@env";
+import { SpotifyClientId, SpotifyClientSecret } from "@env";
+import logger from "loglevel";
 
-import { ManagementConfiguration, SortPlaylists, FetchPlaylistTracks, SortTracks } from "@eimerreis/playlist-manager-shared";
+import { ManagementConfiguration, SortPlaylists, FetchPlaylistTracks, SortTracks, AddTracksToArchiveList } from "@eimerreis/playlist-manager-shared";
+import { getLogger } from "loglevel";
+import kleur from "kleur";
 
 
-export const WatchPlaylist = (config: ManagementConfiguration, refreshToken: string) => {
-    const api = new SpotifyApi({
-        clientId: SpotifyClientId,
-        clientSecret: SpotifyClientSecret,
-        refreshToken
-    })
+export const WatchPlaylist = async (config: ManagementConfiguration, refreshToken: string) => {
+    try {
+        const api = new SpotifyApi({
+            clientId: SpotifyClientId,
+            clientSecret: SpotifyClientSecret,
+            refreshToken
+        })
 
-    // sort playlist according to configuration
-    SortPlaylists([config], api);
+        logger.info(`Starting with management for playlist ${kleur.bold(config.playlist.name)}`);
+        // refresh the acessToken
+        const { body } = await api.refreshAccessToken();
+        api.setAccessToken(body.access_token);
 
-    // put oldest track into archive list if archive is true
-    RemoveObsoleteTracks(config, api);
+        logger.info(`Sorting playlist...`);
+        // sort playlist according to configuration
+        await SortPlaylists([config], api);
+
+        logger.info(`Removing obsolete tracks`);
+        // put oldest track into archive list if archive is true
+        await RemoveObsoleteTracks(config, api);
+    } catch (err) {
+        logger.error(err);
+    }
 }
 
 const RemoveObsoleteTracks = async (config: ManagementConfiguration, api: SpotifyApi) => {
-    const { archive, playlist, maxTracks, direction } = config;
+    try {
+        const { archive, playlist, maxTracks } = config;
 
-    const tracks = await FetchPlaylistTracks(playlist.id, api);
-    const tracksToDelete = tracks.slice(maxTracks - 1).map(x => x.track);
+        const tracks = await FetchPlaylistTracks(playlist.id, api);
+        const tracksToDelete = tracks.slice(maxTracks).map(x => x.track);
 
-    if(archive) {
-        // put oldest tracks to archive list
+        logger.debug(`Tracks to delete ${kleur.bold(tracksToDelete.length)}`);
+
+        if (archive) {
+            logger.debug(`Adding tracks to archive playlist with id ${kleur.bold(archive)}`);
+            // put oldest tracks to archive list
+            api.addTracksToPlaylist(archive, tracksToDelete.map(x => x.uri));
+        }
+
+        api.removeTracksFromPlaylist(playlist.id, tracksToDelete.map(x => ({ uri: x.uri })));
+    } catch (err) {
+        logger.error(err);
     }
-
-    api.removeTracksFromPlaylist(playlist.id, tracksToDelete, )
 }

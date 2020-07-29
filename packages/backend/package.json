@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon",
-    "build": "babel src --out-dir dist --extensions \".ts, .tsx\" --source-maps inline",
-    "serve": "node dist/server.js"
+    "build-dependencies": "yarn workspace @eimerreis/playlist-manager-shared build",
+    "build": "yarn build-dependencies && babel src --out-dir dist --extensions \".ts, .tsx\" --source-maps inline",
+    "serve": "node dist/index.js"
   },
   "dependencies": {
     "@types/cron": "^1.7.2",
@@ -17,13 +18,17 @@
     "kleur": "^4.0.2",
     "loglevel": "^1.6.8",
     "lowdb": "^1.0.0",
+    "morgan": "^1.10.0",
     "nodemon": "^2.0.4",
     "shortid": "^2.2.15",
-    "spotify-web-api-node": "^4.0.0"
+    "spotify-web-api-node": "^4.0.0",
+    "yup": "^0.29.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.7",
     "@types/lowdb": "^1.0.9",
-    "@types/spotify-web-api-node": "^4.0.1"
+    "@types/morgan": "^1.9.1",
+    "@types/spotify-web-api-node": "^4.0.1",
+    "@types/yup": "^0.29.3"
   }
 }

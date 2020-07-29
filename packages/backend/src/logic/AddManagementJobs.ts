@@ -4,14 +4,15 @@ import { Database } from "../data-access/Database";
 import shortid from "shortid";
 import cron from "cron";
 import { ExecuteManagementJob } from "./ExecuteManagementJob";
+import { InternalManagementRequest } from "../types/InternalManagementRequest";
 
 
 export const AddManagementJobs = async (managementRequest: ManagementRequest) => {
     // give the management job a unqiue id
-    managementRequest = { ...managementRequest, id: shortid() }
+    const internalRequest: InternalManagementRequest = { ...managementRequest, id: shortid() }
 
-    // write stuff to database
+    // write management job to the database
     Database.get("managementJobs")
-            .push(managementRequest)
+            .push(internalRequest)
             .write();
 }

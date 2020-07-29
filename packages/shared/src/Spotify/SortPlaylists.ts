@@ -5,6 +5,7 @@ import SpotifyWebApi from "spotify-web-api-node";
 import { ManagementConfiguration } from "../Types/ManagementConfiguration";
 import { SortTracks } from "./SortTracks";
 import { FetchPlaylistTracks } from "./FetchPlaylistTracks";
+import { GetPlaylistSnapshotId } from "./GetCurrentPlaylistSnapshotId";
 
 export const SortPlaylists = async (managementOptions: ManagementConfiguration[], api: SpotifyWebApi) => {
     for (let { playlist, direction } of managementOptions) {
@@ -12,6 +13,7 @@ export const SortPlaylists = async (managementOptions: ManagementConfiguration[]
         const orderByDate = SortTracks(tracks, direction).map(x => x.track);
         const tracksToMove = tracks.map(x => x.track.id);
 
+        let snapshotId = await GetPlaylistSnapshotId(playlist.id, api);
         let snapshotCounter = 0;
         for (const trackId of tracksToMove) {
             // workaround, as it seems that the snapshot retention is maximum 12 items
@@ -19,8 +21,7 @@ export const SortPlaylists = async (managementOptions: ManagementConfiguration[]
             if (snapshotCounter === 11) {
                 console.debug(`Retrieving new Playlist State...`)
                 console.debug(`${kleur.bold("OldSnapshotId:")} ${playlist.snapshot_id}`);
-                const { body } = await api.getPlaylist(playlist.id);
-                playlist = { ...body };
+                snapshotId = await GetPlaylistSnapshotId(playlist.id, api);
                 console.debug(`${kleur.bold("NewSnapshotId:")} ${playlist.snapshot_id}`);
                 tracks = await FetchPlaylistTracks(playlist.id, api);
                 snapshotCounter = 0;
@@ -35,7 +36,7 @@ export const SortPlaylists = async (managementOptions: ManagementConfiguration[]
 
                 // move from oldIndex to newIndex. It's essentiall to provide the snapshot_id of the playlist here
                 // because otherwise, we'd have to update our newIndex after every change. See https://developer.spotify.com/documentation/general/guides/working-with-playlists/#version-control-and-snapshots
-                await api.reorderTracksInPlaylist(playlist.id, oldIndex, newIndex, { snapshot_id: playlist.snapshot_id });
+                await api.reorderTracksInPlaylist(playlist.id, oldIndex, newIndex, { snapshot_id: snapshotId });
                 snapshotCounter += 1;
             }
         }

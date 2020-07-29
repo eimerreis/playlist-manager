@@ -4,6 +4,6 @@ import { RegisterManagementRoutes } from "./ManagementRoutes";
 
 export const RegisterRoutes = () => {
     const router = express.Router();
-    router.use("/manage", RegisterManagementRoutes);
+    router.use("/manage", RegisterManagementRoutes());
     return router;
 }

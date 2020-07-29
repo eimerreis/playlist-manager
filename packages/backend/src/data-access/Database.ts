@@ -1,10 +1,10 @@
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import Memory from "lowdb/adapters/Memory";
-import { ManagementConfiguration, ManagementRequest } from "@eimerreis/playlist-manager-shared";
+import { InternalManagementRequest } from "../types/InternalManagementRequest";
 
 interface Database {
-    managementJobs: ManagementRequest[];
+    managementJobs: InternalManagementRequest[];
 }
 
 const adapter = new FileSync<Database>("db.json");
@@ -23,4 +23,4 @@ export const JobList = low(memoryAdapter);
 
 JobList.defaults({
     jobs: []
-})
+}).write();

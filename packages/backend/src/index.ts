@@ -35,7 +35,7 @@ const RunJobs = () => {
     jobWatcher.start();
 }
 
-app.listen(3001, () => {
+app.listen(process.env.PORT || 3001, () => {
     // make log level dependent on environment
     logger.setLevel("DEBUG");
     logger.info(`Management Service is running`);

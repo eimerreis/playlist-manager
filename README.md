@@ -35,7 +35,7 @@ I always struggled to keep my playlists up to date altough they had quite an aud
 
 ### Technical
 
-- [ ] Only run 1 job at once
+- [ ] Only run one instance of the same job at once (long running jobs etc)
 - [ ] Use Code Grant + PKCE Flow to not need ClientSecret in CLI
 - [ ] Write Unit Tests for shared functions
 - [ ] Write loglevel plugin which logs to application insights

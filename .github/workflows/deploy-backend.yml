@@ -51,9 +51,6 @@ jobs:
         yarn install
         yarn build
       working-directory: ./packages/backend
-    - name: Copy node_modules to dist
-      run: |
-        cp -R ./node_modules ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:

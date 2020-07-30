@@ -16,6 +16,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - packages/backend/**
 
 env:
   AZURE_WEBAPP_NAME: playlist-manager    # set this to your application's name

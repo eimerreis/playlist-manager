@@ -2,7 +2,7 @@
 <h1>Playlist Manager</h1>
 <p>Automate your spotify playlists with ease</p>
 
-![.github/workflows/deploy-backend.yml](https://github.com/eimerreis/playlist-manager/workflows/.github/workflows/deploy-backend.yml/badge.svg?event=status)
+![.github/workflows/deploy-backend.yml](https://github.com/eimerreis/playlist-manager/workflows/.github/workflows/deploy-backend.yml/badge.svg)
 [![GitHub](https://img.shields.io/github/license/eimerreis/playlist-manager?color=brightgreen)](https://github.com/eimerreis/playlist-manager/blob/master/LICENSE)
 
 ---

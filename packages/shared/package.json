@@ -6,7 +6,8 @@
   "scripts": {
     "build-dependencies": "yarn workspace @eimerreis/playlist-manager-shared build",
     "build": "cd ./src && npx barrelsby --delete --exclude lib --location all && cd ../ && ./node_modules/.bin/babel src -d lib --extensions '.ts' && tsc",
-    "develop": "tsc --watch"
+    "develop": "tsc --watch",
+    "commit": "npx git-cz"
   },
   "dependencies": {
     "loglevel": "^1.6.8",

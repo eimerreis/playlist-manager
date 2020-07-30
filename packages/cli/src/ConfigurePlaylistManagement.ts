@@ -4,7 +4,6 @@ import prompts from "prompts";
 import superagent from "superagent";
 import SpotifyWebApi from "spotify-web-api-node";
 
-
 import { FetchAllItems, SortPlaylists, ManagementRequest, CreateArchivePlaylist, AddTracksToArchiveList } from "@eimerreis/playlist-manager-shared"
 import { ManagementConfiguration } from "@eimerreis/playlist-manager-shared";
 import { Direction } from "@eimerreis/playlist-manager-shared";
@@ -13,7 +12,6 @@ enum ArchiveChoice {
     Create,
     Select
 }
-
 
 export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
     try {
@@ -118,7 +116,11 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
 
 
             managementConfigurations.push({
-                playlist,
+                // todo: only send necessary data to backend
+                playlist: {
+                    name: playlist.name,
+                    id: playlist.id,
+                },
                 maxTracks: numberOfTracks,
                 archive: archiveList,
                 direction

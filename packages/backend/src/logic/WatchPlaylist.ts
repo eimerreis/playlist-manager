@@ -2,13 +2,16 @@ import SpotifyApi from "spotify-web-api-node";
 import { SpotifyClientId, SpotifyClientSecret } from "@env";
 import logger from "loglevel";
 
-import { ManagementConfiguration, SortPlaylists, FetchPlaylistTracks, SortTracks, AddTracksToArchiveList } from "@eimerreis/playlist-manager-shared";
-import { getLogger } from "loglevel";
+import { ManagementConfiguration, SortPlaylists, FetchPlaylistTracks } from "@eimerreis/playlist-manager-shared";
 import kleur from "kleur";
+import { Decrypt } from "../data-access/Crypto";
 
 
 export const WatchPlaylist = async (config: ManagementConfiguration, refreshToken: string) => {
     try {
+        // decrypt the refresh token
+        refreshToken = Decrypt(refreshToken);
+
         const api = new SpotifyApi({
             clientId: SpotifyClientId,
             clientSecret: SpotifyClientSecret,
@@ -41,13 +44,15 @@ const RemoveObsoleteTracks = async (config: ManagementConfiguration, api: Spotif
 
         logger.debug(`Tracks to delete ${kleur.bold(tracksToDelete.length)}`);
 
-        if (archive) {
-            logger.debug(`Adding tracks to archive playlist with id ${kleur.bold(archive)}`);
-            // put oldest tracks to archive list
-            api.addTracksToPlaylist(archive, tracksToDelete.map(x => x.uri));
+        if(tracksToDelete.length > 0) {
+            if (archive) {
+                logger.debug(`Adding tracks to archive playlist with id ${kleur.bold(archive)}`);
+                // put oldest tracks to archive list
+                api.addTracksToPlaylist(archive, tracksToDelete.map(x => x.uri));
+            }
+    
+            api.removeTracksFromPlaylist(playlist.id, tracksToDelete.map(x => ({ uri: x.uri })));
         }
-
-        api.removeTracksFromPlaylist(playlist.id, tracksToDelete.map(x => ({ uri: x.uri })));
     } catch (err) {
         logger.error(err);
     }

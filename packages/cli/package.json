@@ -7,7 +7,8 @@
     "watch": "./node_modules/.bin/babel src -d lib --extensions '.ts' --watch",
     "build-dependencies": "yarn workspace @eimerreis/playlist-manager-shared build",
     "build": "yarn build-dependencies && ./node_modules/.bin/babel src -d lib --extensions '.ts'",
-    "start": "yarn build && node lib/index.js"
+    "start": "yarn build && node lib/index.js",
+    "commit": "npx git-cz"
   },
   "dependencies": {
     "@eimerreis/playlist-manager-shared": "^1.0.0",

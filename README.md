@@ -2,6 +2,7 @@
 <h1>Playlist Manager</h1>
 <p>Automate your spotify playlists with ease</p>
 
+![.github/workflows/deploy-backend.yml](https://github.com/eimerreis/playlist-manager/workflows/.github/workflows/deploy-backend.yml/badge.svg?event=status)
 [![GitHub](https://img.shields.io/github/license/eimerreis/playlist-manager?color=brightgreen)](https://github.com/eimerreis/playlist-manager/blob/master/LICENSE)
 
 ---
@@ -29,13 +30,14 @@ I always struggled to keep my playlists up to date altough they had quite an aud
 - [ ] Support Playlists without a "max item" count
   - Spotify's track limit for playlists is 10.000 items
 - [ ] Retrieve Existing Configurations for that user from Backend
-  - [ ] Need to Check the users identity via /me route in backend to do so 
+  - [ ] Need to Check the users identity via /me route in backend to do so
 
 ### Technical
 
 - [ ] Use Code Grant + PKCE Flow to not need ClientSecret in CLI
 - [ ] Write Unit Tests for shared functions
 - [ ] Write loglevel plugin which logs to application insights
+- [ ] Enable seamless debugging of backend
 
 ## Components
 

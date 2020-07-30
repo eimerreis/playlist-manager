@@ -32,21 +32,25 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ env.NODE_VERSION }}
-    - name: Create .env file
-      uses: SpicyPizza/create-envfile@v1.0
+    - name: Write File
+      uses: DamianReeves/write-file-action@v1.0
       with:
-        SpotifyClientId: ${{ secrets.SPOTIFY_CLIENT_ID }}
-        SpotifyClientSecret: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-        EncryptionPassword: ${{ secrets.ENCRYPTION_PASSWORD }}
-        PlaylistWatchInterval: "1/45 * * * * *"
-        # The filename for the envfile
-        file_name: .env
+        # The path to the file to write
+        path: ./packages/backend/.env
+        # The contents of the file
+        contents: |
+          EncryptionPassword=${{ secrets.ENCRYPTION_PASSWORD }}
+          SpotifyClientId=${{ secrets.SPOTIFY_CLIENT_ID }}
+          SpotifyClientSecret=${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          PlaylistWatchInterval=1/45 * * * * *
+        write-mode: overwrite
     - name: npm install, build, and test
       run: |
         # Build and test the project, then
         # deploy to Azure Web App.
         yarn install
         yarn build
+      working-directory: ./packages/backend
     - name: 'Deploy to Azure WebApp'
       uses: azure/webapps-deploy@v2
       with:

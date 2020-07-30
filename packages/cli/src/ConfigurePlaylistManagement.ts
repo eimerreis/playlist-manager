@@ -143,7 +143,7 @@ export const ConfigurePlaylistManagement = async (api: SpotifyWebApi) => {
 
         logger.info(`Sending ${kleur.bold(managementConfigurations.length)} playlist configurations to management service...`);
         const response = await superagent
-            .post("http://localhost:3001/api/manage")
+            .post("http://playlist-manager.azurewebsites.net/api/manage")
             .send(managementRequest);
 
         if (response.status === 201) {

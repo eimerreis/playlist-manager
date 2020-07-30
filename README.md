@@ -27,6 +27,7 @@ I always struggled to keep my playlists up to date altough they had quite an aud
 
 ### Functional
 
+- [ ] Provide Feature to Stop Watching a certain playlist
 - [ ] Support Playlists without a "max item" count
   - Spotify's track limit for playlists is 10.000 items
 - [ ] Retrieve Existing Configurations for that user from Backend
@@ -34,10 +35,12 @@ I always struggled to keep my playlists up to date altough they had quite an aud
 
 ### Technical
 
+- [ ] Only run 1 job at once
 - [ ] Use Code Grant + PKCE Flow to not need ClientSecret in CLI
 - [ ] Write Unit Tests for shared functions
 - [ ] Write loglevel plugin which logs to application insights
 - [ ] Enable seamless debugging of backend
+- [ ] Deployment should not clear the database
 
 ## Components
 

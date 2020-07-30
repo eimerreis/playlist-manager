@@ -6,7 +6,7 @@
 	"scripts": {
 		"start": "yarn build-dependencies && babel-node -x \".ts\" src/index.ts",
 		"build-dependencies": "yarn workspace @eimerreis/playlist-manager-shared build",
-		"build": "webpack",
+		"build": "yarn build-dependencies && webpack",
 		"serve": "node dist/index.js",
 		"commit": "npx git-cz"
 	},

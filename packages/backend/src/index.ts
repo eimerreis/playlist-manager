@@ -19,20 +19,24 @@ app.use(morgan('combined'));
 app.use("/api", RegisterRoutes());
 
 const RunJobs = () => {
-    logger.info("Initially Registering Job Watcher");
-    const jobWatcher = cron.job("1/5 * * * * *", () => {
-        logger.info("Looking for new job registrations...");
-
-        const runningJobs = JobList.get("jobs").value();
-        const registeredJobs = Database.get("managementJobs").value();
-
-        const notRunningJobs = registeredJobs.filter(x => x.id && !runningJobs.includes(x.id));
-        logger.info(`Found ${notRunningJobs.length} new Jobs to schedule`);
-        for(const job of notRunningJobs) {
-            ExecuteManagementJob(job);
-        }
-    });
-    jobWatcher.start();
+    try {
+        logger.info("Initially Registering Job Watcher");
+        const jobWatcher = cron.job("1/5 * * * * *", () => {
+            logger.info("Looking for new job registrations...");
+    
+            const runningJobs = JobList.get("jobs").value();
+            const registeredJobs = Database.get("managementJobs").value();
+    
+            const notRunningJobs = registeredJobs.filter(x => x.id && !runningJobs.includes(x.id));
+            logger.info(`Found ${notRunningJobs.length} new Jobs to schedule`);
+            for(const job of notRunningJobs) {
+                ExecuteManagementJob(job);
+            }
+        });
+        jobWatcher.start();
+    } catch(err) {
+        logger.error(err);
+    }
 }
 
 app.listen(process.env.PORT || 3001, () => {

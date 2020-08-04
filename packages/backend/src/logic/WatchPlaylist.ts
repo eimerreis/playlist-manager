@@ -5,10 +5,12 @@ import logger from "loglevel";
 import { ManagementConfiguration, SortPlaylists, FetchPlaylistTracks } from "@eimerreis/playlist-manager-shared";
 import kleur from "kleur";
 import { Decrypt } from "../data-access/Crypto";
+import { Database } from "../data-access/Database";
 
 
 export const WatchPlaylist = async (config: ManagementConfiguration, refreshToken: string) => {
     try {
+        Database.get("inProgress").push(config.playlist.id).write();
         // decrypt the refresh token
         refreshToken = Decrypt(refreshToken);
 
@@ -23,7 +25,7 @@ export const WatchPlaylist = async (config: ManagementConfiguration, refreshToke
         const { body } = await api.refreshAccessToken();
         api.setAccessToken(body.access_token);
 
-        logger.info(`Sorting playlist...`);
+        logger.info(`Sorting playlist ${config.playlist.name}...`);
         // sort playlist according to configuration
         await SortPlaylists([config], api);
 
@@ -32,6 +34,8 @@ export const WatchPlaylist = async (config: ManagementConfiguration, refreshToke
         await RemoveObsoleteTracks(config, api);
     } catch (err) {
         logger.error(err);
+    } finally {
+        Database.get("inProgress").remove(x => x === config.playlist.id).write();
     }
 }
 

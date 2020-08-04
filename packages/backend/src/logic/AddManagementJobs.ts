@@ -2,13 +2,13 @@ import { ManagementRequest, ManagementConfiguration } from "@eimerreis/playlist
 import SpotifyApi from "spotify-web-api-node";
 import { Database } from "../data-access/Database";
 import shortid from "shortid";
-import cron from "cron";
-import { ExecuteManagementJob } from "./ExecuteManagementJob";
+import logger from "loglevel";
 import { InternalManagementRequest } from "../types/InternalManagementRequest";
 import { Decrypt, Encrypt } from "../data-access/Crypto";
 
 
 export const AddManagementJobs = async (managementRequest: ManagementRequest) => {
+    try {
     // give the management job a unqiue id
     const internalRequest: InternalManagementRequest = { ...managementRequest, id: shortid() }
 
@@ -19,4 +19,8 @@ export const AddManagementJobs = async (managementRequest: ManagementRequest) =>
     Database.get("managementJobs")
             .push(internalRequest)
             .write();
+    } catch(err) {
+        logger.error(err);
+    }
+
 }

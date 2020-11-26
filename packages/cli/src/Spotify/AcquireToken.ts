@@ -54,15 +54,25 @@ app.get('/auth', async (req, res) => {
             .send(`grant_type=authorization_code&code=${code}&redirect_uri=${RedirectUri}&client_id=${SpotifyClientId}&client_secret=${SpotifyClientSecret}`)
 
         const body = tokenResponse.body as AccessTokenResponse;
+        console.log(body);
 
-        ConfigurePlaylistManagement(new SpotifyApi({
-            accessToken: body.access_token,
-            clientId: SpotifyClientId,
-            clientSecret: SpotifyClientSecret,
-            redirectUri: RedirectUri,
-            refreshToken: body.refresh_token
-        }));
+        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+        const authenticateResponse = await superagent
+            .post("https://localhost:5001/api/authenticate")
+            .type('application/json')
+            .send({
+                accessToken: body.access_token,
+                refreshToken: body.refresh_token
+            });
 
+        // ConfigurePlaylistManagement(new SpotifyApi({
+        //     accessToken: body.access_token,
+        //     clientId: SpotifyClientId,
+        //     clientSecret: SpotifyClientSecret,
+        //     redirectUri: RedirectUri,
+        //     refreshToken: body.refresh_token
+        // }));
+        
     } catch (err) {
         console.error(err);
     } finally {

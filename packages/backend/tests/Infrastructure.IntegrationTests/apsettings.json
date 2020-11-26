@@ -1,0 +1,6 @@
+{
+  "ServiceBus": {
+    "QueueName": "jobs",
+    "ConnectionString": ""
+  }
+}

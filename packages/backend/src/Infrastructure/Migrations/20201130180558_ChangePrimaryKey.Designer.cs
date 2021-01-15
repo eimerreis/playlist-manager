@@ -4,14 +4,16 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20201130180558_ChangePrimaryKey")]
+    partial class ChangePrimaryKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,9 +24,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ManagementJob", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PlaylistId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ArchiveList")
                         .HasColumnType("nvarchar(max)");
@@ -38,6 +42,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Direction")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -50,17 +57,24 @@ namespace Infrastructure.Migrations
                     b.Property<int>("MaximumTracks")
                         .HasColumnType("int");
 
-                    b.Property<string>("PlaylistId")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("UserId", "PlaylistId");
 
-                    b.Property<string>("UserId")
+                    b.HasIndex("PlaylistId");
+
+                    b.ToTable("ManagementJobs");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Playlist", b =>
+                {
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ManagementJobs");
+                    b.ToTable("Playlists");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -81,9 +95,17 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ManagementJob", b =>
                 {
+                    b.HasOne("Domain.Entities.Playlist", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "User")
                         .WithMany("ManagementJobs")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

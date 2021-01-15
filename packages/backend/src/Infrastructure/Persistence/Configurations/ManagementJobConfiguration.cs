@@ -12,14 +12,7 @@ namespace Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<ManagementJob> builder)
         {
             builder.Ignore(m => m.DomainEvents);
-        }
-    }
-
-    public class PlaylistConfiguration : IEntityTypeConfiguration<Playlist>
-    {
-        public void Configure(EntityTypeBuilder<Playlist> builder)
-        {
-            builder.ToTable("Playlists");
+            builder.HasKey("Id");
         }
     }
 }

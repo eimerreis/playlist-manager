@@ -2,6 +2,7 @@
 using Domain.Entities;
 using MediatR;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,22 +19,29 @@ namespace Application.ManagementJobs.Commands.CreateManagementJob
 
         public async Task<Guid> Handle(CreateManagementJobCommand request, CancellationToken cancellationToken)
         {
-            var entityEntry = _DatabaseContext.ManagementJobs.Add(new ManagementJob()
+            var existing = _DatabaseContext.ManagementJobs.FirstOrDefault(x => x.PlaylistId == request.PlaylistId && x.UserId == request.UserId);
+            if (existing == null)
             {
-                ArchiveList = request.ArchiveListId,
-                Direction = request.Direction,
-                MaximumTracks = request.MaximumTracks,
-                User = new User
+                var entityEntry = _DatabaseContext.ManagementJobs.Add(new ManagementJob()
                 {
-                    Id = request.UserId,
-                },
-                Playlist = new Playlist
-                {
-                    Id = request.PlaylistId,
-                }
-            });
-            await _DatabaseContext.SaveChangesAsync(cancellationToken);
-            return entityEntry.Entity.Id;
+                    ArchiveList = request.ArchiveListId,
+                    Direction = request.Direction,
+                    MaximumTracks = request.MaximumTracks,
+                    User = await _DatabaseContext.Users.FindAsync(request.UserId),
+                    PlaylistId = request.PlaylistId,
+                });
+                await _DatabaseContext.SaveChangesAsync(cancellationToken);
+                return entityEntry.Entity.Id;
+            }
+            else
+            {
+                existing.ArchiveList = request.ArchiveListId;
+                existing.Direction = request.Direction;
+                existing.MaximumTracks = request.MaximumTracks;
+
+                await _DatabaseContext.SaveChangesAsync(cancellationToken);
+                return existing.Id;
+            }
         }
     }
 }

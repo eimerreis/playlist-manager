@@ -14,11 +14,14 @@ namespace Domain.Entities
         }
 
         public Guid Id { get; set; }
-        public Playlist Playlist { get; set; }
+
         public string PlaylistId { get; set; }
+
         public int MaximumTracks { get; set; }
         public string ArchiveList { get; set; }
         public SortDirection Direction { get; set; }
+
+        public string UserId {get; set;}
         public User User { get; set; }
 
         private bool _isActive;

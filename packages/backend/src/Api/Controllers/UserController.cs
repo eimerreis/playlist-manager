@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Api.Models.Request;
 using Application.Common.Exceptions;
+using Application.ManagementJobs.Queries;
 using Application.Users.Commands.AddUser;
 using Application.Users.Commands.UpdateUserTokens;
 using MediatR;
@@ -52,6 +53,20 @@ namespace Api.Controllers
                 return Ok();
             }
             catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/users/{userId}/management-jobs")]
+        public async Task<IActionResult> GetManagementJobsByUser([FromRoute] string userId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var jobs = await _Mediator.Send(new GetManagementJobsByUserQuery { UserId = userId });
+                return Ok(jobs);
+            } catch(NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }

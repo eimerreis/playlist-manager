@@ -15,11 +15,6 @@ namespace Infrastructure.Persistence
         private readonly ICurrentUserService _CurrentUserService;
         private readonly IDomainEventService _DomainEventService;
 
-        public DatabaseContext(DbContextOptions<DatabaseContext> options)
-           : base(options)
-        {
-        }
-
         public DatabaseContext(
             DbContextOptions<DatabaseContext> options, ICurrentUserService currentUserService, IDomainEventService domainEventService)
             : base(options)
@@ -31,7 +26,7 @@ namespace Infrastructure.Persistence
         public DbSet<ManagementJob> ManagementJobs { get; set; }
         public DbSet<User> Users { get; set; }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
             {
@@ -48,7 +43,9 @@ namespace Infrastructure.Persistence
                 }
             }
 
-            return base.SaveChangesAsync(cancellationToken);
+            var result = await base.SaveChangesAsync(cancellationToken);
+            await DispatchEvents(cancellationToken);
+            return result;
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

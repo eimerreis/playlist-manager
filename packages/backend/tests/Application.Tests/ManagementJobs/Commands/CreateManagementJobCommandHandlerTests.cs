@@ -23,7 +23,7 @@ namespace Application.Tests.ManagementJobs.Commands
                 result.Should().NotBeEmpty();
 
                 var created = await dbContext.ManagementJobs.FindAsync(result);
-                created.Playlist.Id.Should().Be(command.PlaylistId);
+                created.PlaylistId.Should().Be(command.PlaylistId);
             }
         }
     }

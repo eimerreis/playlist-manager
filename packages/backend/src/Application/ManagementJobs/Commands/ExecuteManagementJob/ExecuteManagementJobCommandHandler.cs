@@ -34,7 +34,11 @@ namespace Application.ManagementJobs.Commands.ExecuteManagementJob
             // manage playlist => place logic here !?
             // maybe better to enqueue other commands for each step => separation of concerns
             await _Mediator.Send(new SortPlaylistCommand { Direction = job.Direction, PlaylistId = job.PlaylistId });
-            await _Mediator.Send(new RemoveAndArchiveTracksCommand { PlaylistId = job.PlaylistId, ArchiveListId = job.ArchiveList, MaximumTracks = job.MaximumTracks });
+            
+            if(job.MaximumTracks != -1)
+            {
+                await _Mediator.Send(new RemoveAndArchiveTracksCommand { PlaylistId = job.PlaylistId, ArchiveListId = job.ArchiveList, MaximumTracks = job.MaximumTracks });
+            }
 
             // see if job is still running in db and queue new execution
             job = await _DatabaseContext.ManagementJobs.FindAsync(request.ManagementJobId);

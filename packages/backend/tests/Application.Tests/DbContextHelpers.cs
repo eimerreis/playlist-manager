@@ -29,7 +29,7 @@ namespace Application.Tests
             domainEventService.Setup(x => x.Publish(It.IsAny<DomainEvent>())).Returns(It.IsAny<Task>());
 
             var options = GetDbContextOptions();
-            return new DatabaseContext(options, userService.Object, domainEventService.Object);
+            return new DatabaseContext(options, userService.Object);
         }
     }
 }

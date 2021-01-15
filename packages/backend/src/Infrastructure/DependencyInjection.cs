@@ -44,6 +44,7 @@ namespace Infrastructure
             
             services.AddSingleton<SpotifyClientConfig>((c) => SpotifyClientConfig.CreateDefault());
             services.AddScoped<IStreamingService, SpotifyService>();
+            services.AddScoped<IDomainEventService, DomainEventService>();
 
             return services;
         }

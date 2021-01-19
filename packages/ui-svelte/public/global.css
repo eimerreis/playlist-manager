@@ -5,6 +5,7 @@ html, body {
 }
 
 body {
+	background-color: rgba(0,0,0,0.01);
 	color: #333;
 	margin: 0;
 	padding: 8px;

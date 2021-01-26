@@ -8,26 +8,18 @@
 	import Login from "./Components/Login.svelte";
 </script>
 
-<style>
-	main {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-flow: column wrap;
-		max-width: 240px;
-		margin: 0 auto;
-		width: 1080px;
-	}
+<style global lang="postcss">
+	/* only apply purgecss on utilities, per Tailwind docs */
+  	/* purgecss start ignore */
+  	@tailwind base;
+  	@tailwind components;
+  	/* purgecss end ignore */
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+	@tailwind utilities;  
 </style>
 
 <Router>
-	<main>
+	<main class="container mx-auto max-w-screen-lg">
 		<Header />
 		<PrivateRoute path="/">
 			<Overview />

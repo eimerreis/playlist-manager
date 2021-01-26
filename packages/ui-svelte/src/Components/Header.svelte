@@ -1,12 +1,4 @@
-<style>
-    header {
-        font-weight: 100;
-        font-size: 2rem;
-        text-transform: uppercase;
-    }
 
-</style>
-
-<header>
-    <h1>EimerReis - Playlist Manager</h1>
+<header class="mx-auto p-32 overflow-visible">
+    <h1 class="text-6xl text-center font-extrabold">Playlist Manager</h1>
 </header>

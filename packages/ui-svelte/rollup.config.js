@@ -11,6 +11,11 @@ import replace from "@rollup/plugin-replace";
 
 const production = !process.env.ROLLUP_WATCH;
 
+const parsedConfig = config().parsed;
+if (!parsedConfig) {
+	throw new Error(".env config file could not be parsed");
+}
+
 function serve() {
 	let server;
 

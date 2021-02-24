@@ -8,16 +8,7 @@
     const playlistsPromise = client.getUserPlaylists($AuthenticationStore.user.id);
 </script>
 
-<style>
-    .playlists {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 33% 33% 33%;
-        gap: 24px;
-    }
-</style>
-
-<section class="playlists">
+<section class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
     {#if playlistsPromise}
         {#await playlistsPromise}
             <span />

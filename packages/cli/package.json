@@ -13,7 +13,7 @@
   "dependencies": {
     "@eimerreis/playlist-manager-shared": "^1.0.0",
     "@types/prompts": "^2.0.8",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "kleur": "^4.0.2",
     "opn": "^6.0.0",
     "prompts": "^2.3.2",
